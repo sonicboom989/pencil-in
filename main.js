@@ -22,14 +22,19 @@ function createWindow() {
         resizable: false,
         frame: false,
         transparent: true,
+        backgroundColor: '#00000000',
         alwaysOnTop: true,
         skipTaskbar: true,
+        show: false,
+        hasShadow: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     });
 
+    // Show only after the page has painted to avoid corner artifacts
+    win.once('ready-to-show', () => win.show());
     win.loadFile('index.html');
 }
 

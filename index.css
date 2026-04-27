@@ -4,17 +4,28 @@
     padding: 0;
 }
 
-body {
-    background: rgba(22, 22, 22, 0.92);
-    color: #e2e8f0;
-    height: 100vh;
+/* html and body are fully transparent — clipping is handled by .window */
+html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+}
+
+/* ── Window wrapper — the only element responsible for shape and background ── */
+
+.window {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    user-select: none;
-    overflow: hidden;
+    background: rgba(22, 22, 22, 0.99);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    user-select: none;
 }
 
 /* ── Header (drag handle) ── */
@@ -58,8 +69,8 @@ header {
     transition: background 0.15s, color 0.15s;
 }
 
-#calendar:hover { background: rgba(255,255,255,0.06); color: #a1a1aa; }
-#close:hover    { background: rgba(239,68,68,0.15);   color: #f87171; }
+#calendar:hover { background: rgba(255, 255, 255, 0.06); color: #a1a1aa; }
+#close:hover    { background: rgba(239, 68, 68, 0.15);   color: #f87171; }
 
 /* ── Status ── */
 
