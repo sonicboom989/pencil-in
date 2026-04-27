@@ -1,0 +1,7 @@
+node_modules/
+.env
+dist/
+build/
+.next/
+credentials.json
+token.json

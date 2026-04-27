@@ -1,0 +1,17 @@
+{
+  "name": "pencil-in",
+  "version": "1.0.0",
+  "description": "Natural language to calendar widget.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Luke Coffman",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^41.3.0"
+  },
+  "dependencies": {
+    "googleapis": "^171.4.0"
+  }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <span class="app-title">pencil-in</span>
+        <div class="header-actions">
+            <button id="calendar" title="Open Google Calendar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+            </button>
+            <button id="close" title="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div id="status-area">
+        <p id="status"></p>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="input-row">
+            <input id="input" type="text" placeholder="Add an event..." autocomplete="off"/>
+            <button id="submit" title="Schedule event">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="ollama.js"></script>
+    <script>
+        const calendarUrl = 'https://calendar.google.com';
+        const fs = require('fs');
+        const { ipcRenderer } = require('electron');
+
+        const settings = JSON.parse(fs.readFileSync('settings.json'));
+        const timezone = settings.timezone;
+
+        const statusEl  = document.getElementById('status');
+        const inputEl   = document.getElementById('input');
+        const submitBtn = document.getElementById('submit');
+
+        function setStatus(text, type = '') {
+            statusEl.textContent = text;
+            statusEl.className = type;
+        }
+
+        async function scheduleEvent() {
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            setStatus('Thinking...', 'loading');
+            submitBtn.disabled = true;
+
+            try {
+                const event  = await parseWithOllama(text, timezone);
+                const result = await ipcRenderer.invoke('schedule-event', event);
+
+                setStatus(result.message, result.success ? 'success' : 'error');
+                if (result.success) inputEl.value = '';
+            } catch (err) {
+                setStatus('Could not parse event — please try again.', 'error');
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        submitBtn.onclick = scheduleEvent;
+
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') scheduleEvent();
+        });
+
+        document.getElementById('calendar').onclick = () => {
+            require('electron').shell.openExternal(calendarUrl);
+        };
+
+        document.getElementById('close').onclick = () => {
+            ipcRenderer.send('close-window');
+        };
+    </script>
+</body>
+</html>
